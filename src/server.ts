@@ -1,81 +1,129 @@
 import express from "express";
 
-const app = express();
+import {
+    manifestRouter
+} from "./routes/manifest.js";
+
+
+const app =
+    express();
+
 
 const PORT =
     Number(process.env.PORT) || 3000;
 
-app.use(express.json());
+
+/* =========================================================
+   MIDDLEWARE
+========================================================= */
+
+app.use(
+    express.json()
+);
 
 
 /* =========================================================
    CORS
 ========================================================= */
 
-app.use((_req, res, next) => {
+app.use(
+    (_req, res, next) => {
 
-    res.header(
-        "Access-Control-Allow-Origin",
-        "*"
-    );
+        res.header(
+            "Access-Control-Allow-Origin",
+            "*"
+        );
 
-    res.header(
-        "Access-Control-Allow-Methods",
-        "GET,HEAD,OPTIONS"
-    );
 
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Content-Type"
-    );
+        res.header(
+            "Access-Control-Allow-Methods",
+            "GET,HEAD,OPTIONS"
+        );
 
-    if (_req.method === "OPTIONS") {
 
-        res.sendStatus(204);
+        res.header(
+            "Access-Control-Allow-Headers",
+            "Content-Type"
+        );
 
-        return;
+
+        if (
+            _req.method ===
+            "OPTIONS"
+        ) {
+
+            res.sendStatus(204);
+
+            return;
+
+        }
+
+
+        next();
 
     }
-
-    next();
-
-});
+);
 
 
 /* =========================================================
-   ROOT
+   ROOT API
 ========================================================= */
 
-app.get("/", (_req, res) => {
+app.get(
+    "/",
+    (_req, res) => {
 
-    res.json({
-        name: "WORLD WAR",
-        server: "online",
-        version: "1.0.0"
-    });
+        res.json({
 
-});
+            name:
+                "WORLD WAR",
+
+            server:
+                "online",
+
+            version:
+                "1.0.0"
+
+        });
+
+    }
+);
 
 
 /* =========================================================
-   HEALTH CHECK
+   HEALTH API
 ========================================================= */
 
-app.get("/health", (_req, res) => {
+app.get(
+    "/health",
+    (_req, res) => {
 
-    res.status(200).json({
+        res.status(200)
+            .json({
 
-        status: "ok",
+                status:
+                    "ok",
 
-        service:
-            "worldwar-server",
+                service:
+                    "worldwar-server",
 
-        timestamp:
-            new Date().toISOString()
+                timestamp:
+                    new Date()
+                        .toISOString()
 
-    });
+            });
 
-});
+    }
+);
+
+
+/* =========================================================
+   MANIFEST API
+========================================================= */
+
+app.use(
+    manifestRouter
+);
 
 
 /* =========================================================
