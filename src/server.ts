@@ -4,27 +4,19 @@ import {
     manifestRouter
 } from "./routes/manifest.js";
 
+import {
+    hunterRouter
+} from "./routes/hunter.js";
 
 const app =
     express();
 
-
 const PORT =
     Number(process.env.PORT) || 3000;
-
-
-/* =========================================================
-   MIDDLEWARE
-========================================================= */
 
 app.use(
     express.json()
 );
-
-
-/* =========================================================
-   CORS
-========================================================= */
 
 app.use(
     (_req, res, next) => {
@@ -34,47 +26,32 @@ app.use(
             "*"
         );
 
-
         res.header(
             "Access-Control-Allow-Methods",
             "GET,HEAD,OPTIONS"
         );
-
 
         res.header(
             "Access-Control-Allow-Headers",
             "Content-Type"
         );
 
-
         if (
             _req.method ===
             "OPTIONS"
         ) {
-
             res.sendStatus(204);
-
             return;
-
         }
 
-
         next();
-
     }
 );
-
-
-/* =========================================================
-   ROOT API
-========================================================= */
 
 app.get(
     "/",
     (_req, res) => {
-
         res.json({
-
             name:
                 "WORLD WAR",
 
@@ -83,24 +60,15 @@ app.get(
 
             version:
                 "1.0.0"
-
         });
-
     }
 );
-
-
-/* =========================================================
-   HEALTH API
-========================================================= */
 
 app.get(
     "/health",
     (_req, res) => {
-
         res.status(200)
             .json({
-
                 status:
                     "ok",
 
@@ -110,34 +78,24 @@ app.get(
                 timestamp:
                     new Date()
                         .toISOString()
-
             });
-
     }
 );
-
-
-/* =========================================================
-   MANIFEST API
-========================================================= */
 
 app.use(
     manifestRouter
 );
 
-
-/* =========================================================
-   START SERVER
-========================================================= */
+app.use(
+    hunterRouter
+);
 
 app.listen(
     PORT,
     "0.0.0.0",
     () => {
-
         console.log(
             `WORLD WAR server running on port ${PORT}`
         );
-
     }
 );
