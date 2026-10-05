@@ -8,6 +8,10 @@ import {
     hunterRouter
 } from "./routes/hunter.js";
 
+import {
+    monitorRouter
+} from "./routes/monitor.js";
+
 const app =
     express();
 
@@ -33,7 +37,7 @@ app.use(
 
         res.header(
             "Access-Control-Allow-Headers",
-            "Content-Type"
+            "Content-Type,X-WorldWar-Hunter,X-WorldWar-Hunter-Protocol,X-WorldWar-Keepalive"
         );
 
         if (
@@ -51,7 +55,9 @@ app.use(
 app.get(
     "/",
     (_req, res) => {
+
         res.json({
+
             name:
                 "WORLD WAR",
 
@@ -67,8 +73,10 @@ app.get(
 app.get(
     "/health",
     (_req, res) => {
+
         res.status(200)
             .json({
+
                 status:
                     "ok",
 
@@ -90,10 +98,15 @@ app.use(
     hunterRouter
 );
 
+app.use(
+    monitorRouter
+);
+
 app.listen(
     PORT,
     "0.0.0.0",
     () => {
+
         console.log(
             `WORLD WAR server running on port ${PORT}`
         );

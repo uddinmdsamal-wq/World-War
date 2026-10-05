@@ -5,6 +5,11 @@ import {
     HUNTING_SERVER_KEEPALIVE_DELAY_MS
 } from "../contracts/hunting-server-keepalive.js";
 
+import {
+    recordHuntingServerKeepaliveSuccess,
+    recordHuntingServerKeepaliveFailure
+} from "../monitor/server-monitor-state.js";
+
 const DEFAULT_HUNTING_SERVER_URL =
     "http://127.0.0.1:3001";
 
@@ -32,7 +37,10 @@ function buildKeepaliveUrl():
 
     const baseUrl =
         getHuntingServerUrl()
-            .replace(/\/+$/, "");
+            .replace(
+                /\/+$/,
+                ""
+            );
 
     return (
         baseUrl +
@@ -42,6 +50,9 @@ function buildKeepaliveUrl():
 
 async function wakeHuntingServer():
     Promise<void> {
+
+    const startedAt =
+        Date.now();
 
     const controller =
         new AbortController();
@@ -64,6 +75,7 @@ async function wakeHuntingServer():
                         "GET",
 
                     headers: {
+
                         [HUNTING_SERVER_KEEPALIVE_HEADER]:
                             HUNTING_SERVER_KEEPALIVE_VALUE
                     },
@@ -73,22 +85,45 @@ async function wakeHuntingServer():
                 }
             );
 
+        const durationMs =
+            Date.now() -
+            startedAt;
+
         if (
             response.ok
         ) {
 
+            recordHuntingServerKeepaliveSuccess(
+                response.status,
+                durationMs
+            );
+
             console.log(
-                `[KEEPALIVE] Hunting Server responded with ${response.status}.`
+                `[KEEPALIVE] Hunting Server responded with ${response.status} in ${durationMs}ms.`
             );
 
             return;
         }
 
+        recordHuntingServerKeepaliveFailure(
+            response.status,
+            durationMs
+        );
+
         console.error(
-            `[KEEPALIVE] Hunting Server returned HTTP ${response.status}.`
+            `[KEEPALIVE] Hunting Server returned HTTP ${response.status} in ${durationMs}ms.`
         );
 
     } catch {
+
+        const durationMs =
+            Date.now() -
+            startedAt;
+
+        recordHuntingServerKeepaliveFailure(
+            null,
+            durationMs
+        );
 
         console.error(
             "[KEEPALIVE] Hunting Server request failed."
